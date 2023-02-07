@@ -206,6 +206,7 @@ def Serial_Data_Receive(port = None, size = 11):
                 # print("now_voltage_data_2:", now_voltage_data_2)
                 # print("now_voltage_data_3:", now_voltage_data_3)
 
+                # 如果缓存数组已经满，则从0开始，用新数据替代旧数据
                 if DataListCount == DataSize:
                     DataListCount = 0
 
@@ -378,6 +379,12 @@ def Rect_Val_Cache_List():
     global now_voltage_data_3_list
 
     return now_time_list, now_voltage_data_0_list, now_voltage_data_1_list, now_voltage_data_2_list, now_voltage_data_3_list
+
+# 返回缓存数组当前size的大小
+def Rect_DataListCount_Value():
+    global DataListCount
+
+    return DataListCount
 
 # 线程一：串口数据接收
 def Thread_SerialDataRecv():
