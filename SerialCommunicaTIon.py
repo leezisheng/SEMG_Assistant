@@ -51,7 +51,7 @@ now_voltage_data_3  = 0
 
 # 数据暂存队列
 # 队列尺寸
-DataSize                = 400
+DataSize                = 500
 #长度占位 声明长度为size的数据区
 now_time_list           = [None]*DataSize
 now_voltage_data_0_list = [None]*DataSize
@@ -72,7 +72,7 @@ VAL_RunTimeCountTimes        = 2000
 # 电压成功接收次数
 VAL_SuccessRecvValValueTimes = 0
 # 是否开启线程测试：0-不启用，1-启用
-USE_THREAD_TEST              = 1
+USE_THREAD_TEST              = 0
 
 # ============================================== 函数定义 ==============================================
 
@@ -104,12 +104,13 @@ def Get_Serial_Port():
     return port[0]
 
 # 打开串口中固定端口并持续接收数据
-def Serial_Data_Receive(port = None, size = 11):
+def Serial_Data_Receive(locker, port = None, size = 11):
     '''
-    @description       : 根据数据帧格式对串口接收数据进行解析
-    @param  {str} port : 指定读取的端口
-    @param  {int} size : 一次读取数据长度(bytes) ，默认11
-    @return {str} temp_data : 单次接收到的数据，16进制显示
+    :description  : 根据数据帧格式对串口接收数据进行解析
+    :param port   : 指定读取的端口
+    :param size   : 一次读取数据长度(bytes) ，默认11
+    :param locker : 互斥锁
+    :return       : 单次接收到的数据，16进制显示
     '''
 
     # 用到的全局变量
@@ -145,9 +146,9 @@ def Serial_Data_Receive(port = None, size = 11):
 
     # 选择端口
     if not port:
-        lock.acquire()
+        locker.acquire()
         port = Get_Serial_Port()
-        lock.release()
+        locker.release()
 
     # 定义串口对象变量
     serial_obj  = None
@@ -155,6 +156,10 @@ def Serial_Data_Receive(port = None, size = 11):
     # 轮询读取
     while True :
         try:
+
+            # 获取互斥锁
+            locker.acquire()
+
             if USE_THREAD_TEST == 1:
                 lock.acquire()
 
@@ -218,7 +223,10 @@ def Serial_Data_Receive(port = None, size = 11):
                 now_voltage_data_3_list[DataListCount] = now_voltage_data_3
                 DataListCount = DataListCount + 1
 
-                # print("DataListCount: ",DataListCount)
+                # print(now_voltage_data_0_list)
+
+                # 释放互斥锁
+                locker.release()
 
                 # 如果启用代码时间统计功能
                 if USE_FUNCTIONS_RUN_TIME_TEST == 1:
@@ -401,7 +409,7 @@ def Thread_SerialDataRecv():
 
             # 经测试：STM32发送频率f=2000Hz，发送两个帧头/0x55/0x55，
             # 上位机不接收停止位，即size=12时，效果最好-玄学
-            Serial_Data_Receive(port=None, size=12)
+            Serial_Data_Receive(lock, port = None, size = 12)
 
             # 如果启用代码时间统计功能
             if USE_FUNCTIONS_RUN_TIME_TEST == 1:
@@ -416,14 +424,14 @@ def Thread_SerialDataRecv():
 
 # 线程二：串口数据打印
 def Thread_PrintValData():
-    global USE_THREAD_TEST
 
     global USE_THREAD_TEST
+
     while True:
         if USE_THREAD_TEST == 1:
             lock.acquire()
             time_list, now_voltage_data_0_list, now_voltage_data_1_list, now_voltage_data_2_list, now_voltage_data_3_list = Rect_Val_Cache_List()
-            # print("time_list:",time_list)
+            print("time_list:",time_list)
             # print("now_voltage_data_0_list:", now_voltage_data_0_list)
             # print("now_voltage_data_1_list:", now_voltage_data_1_list)
             # print("now_voltage_data_2_list:", now_voltage_data_2_list)
@@ -448,7 +456,7 @@ if __name__ == '__main__':
 
         # 经测试：STM32发送频率f=2000Hz，发送两个帧头/0x55/0x55，
         # 上位机不接收停止位，即size=12时，效果最好-玄学
-        Serial_Data_Receive(port=None, size=12)
+        Serial_Data_Receive(lock, port = None, size = 12)
 
         # 如果启用代码时间统计功能
         if USE_FUNCTIONS_RUN_TIME_TEST == 1:

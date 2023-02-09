@@ -19,10 +19,14 @@
 # =============================================== 导入库 ===============================================
 
 # 串口通信相关依赖库
-from SerialCommunication import Serial_Data_Receive,Rect_Now_Val_Values
+import SerialCommunication
 # 绘图相关依赖库
-
-
+import CurveDrawing
+import matplotlib.pyplot as plt
+# 多线程相关的库
+import threading
+# 时间相关的库
+import time
 
 # ============================================== 全局变量 ==============================================
 
@@ -31,15 +35,43 @@ from SerialCommunication import Serial_Data_Receive,Rect_Now_Val_Values
 
 
 # ============================================== 函数定义 ==============================================
+# 串口读取线程
+def Thread_SerialDataRecv():
 
+    while True:
+        # 经测试：STM32发送频率f=2000Hz，发送两个帧头/0x55/0x55，
+        # 上位机不接收停止位，即size=12时，效果最好-玄学
+        SerialCommunication.Serial_Data_Receive(lock, port = None, size = 12)
 
+# 原始SEMG绘图线程
+def Thread_Generate_Original_SEMG_Data():
 
+    fig = plt.figure()
 
+    while True:
+        # 获取锁
+        lock.acquire()
 
+        Test_Time_List, Test_Voltage_Data_0_List, Test_Voltage_Data_1_List, Test_Voltage_Data_2_List, Test_Voltage_Data_3_List = SerialCommunication.Rect_Val_Cache_List()
+        Test_DataListCount = SerialCommunication.Rect_DataListCount_Value()
 
+        # 使用完后释放锁
+        lock.release()
 
+        CurveDrawing.Original_SemgSignal_Plot(fig,
+                                              Test_DataListCount,
+                                              Test_Voltage_Data_0_List,
+                                              Test_Voltage_Data_1_List,
+                                              Test_Voltage_Data_2_List,
+                                              Test_Voltage_Data_3_List,
+                                              Test_Time_List)
 
-
+if __name__ == '__main__':
+    lock = threading.Lock()
+    thread_rcv  = threading.Thread(target=Thread_SerialDataRecv)
+    thread_plot = threading.Thread(target=Thread_Generate_Original_SEMG_Data)
+    thread_rcv.start()
+    thread_plot.start()
 
 
 

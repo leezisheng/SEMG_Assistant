@@ -16,21 +16,21 @@
 # =============================================== 导入库 ===============================================
 
 import matplotlib.pyplot as plt
-import SerialCommunication
 import time
 import random
 import threading
+from SerialCommunication import DataSize
 
 # ============================================== 全局变量 ==============================================
 
 # 是否使用模拟数据生成函数进行多线程测试：0-不启用，1-启用
-USE_GENERATE_DATA_THREAD_TEST   = 1
+USE_GENERATE_DATA_THREAD_TEST   = 0
 
 # 绘图暂停时间
-PLOT_PAUSE_TIME                 = 0.1
+PLOT_PAUSE_TIME                 = 0.01
 
 # 测试生成数据变量
-TEST_DATALIST_SIZE              = 400
+TEST_DATALIST_SIZE              = DataSize
 Test_DataListCount              = 0
 Test_Time_List                  = [None]*TEST_DATALIST_SIZE
 Test_Voltage_Data_0_List        = [None]*TEST_DATALIST_SIZE
@@ -40,7 +40,7 @@ Test_Voltage_Data_3_List        = [None]*TEST_DATALIST_SIZE
 
 # ============================================== 函数定义 ==============================================
 
-# 原始SEMG电压波形绘制
+# 原始SEMG电压波形绘制,使用前需要先创建自定义图像，即fig=plt.figure()
 def Original_SemgSignal_Plot(fig,temp_data_count_val,temp_data_list_0,temp_data_list_1,temp_data_list_2,temp_data_list_3,temp_time_data_list):
     '''
     :param fig:                 画布
@@ -102,7 +102,7 @@ def Original_SemgSignal_Plot(fig,temp_data_count_val,temp_data_list_0,temp_data_
         plt.ylabel("Voltage value(mv)", size=12)
 
         # print(temp_Voltage_Data_0_List[:temp_DataCount_Val])
-        print(temp_data_count_val)
+        # print(temp_data_count_val)
 
         plt.pause(PLOT_PAUSE_TIME)
         plt.ioff()
@@ -188,7 +188,7 @@ def Thread_Plot_Test_Data():
         fig = plt.figure()
 
         while True:
-            
+
             # 获取锁
             lock.acquire()
 
