@@ -20,6 +20,7 @@ import time
 import random
 import threading
 from SerialCommunication import DataSize
+import DigitalSignalsProcess
 
 # ============================================== 全局变量 ==============================================
 
@@ -40,7 +41,8 @@ Test_Voltage_Data_3_List        = [None]*TEST_DATALIST_SIZE
 
 # ============================================== 函数定义 ==============================================
 
-# 原始SEMG电压波形绘制,使用前需要先创建自定义图像，即fig=plt.figure()
+# 原始SEMG电压波形绘制,包括时域曲线和幅频曲线
+# 使用前需要先创建自定义图像，即fig=plt.figure()
 def Original_SemgSignal_Plot(fig,temp_data_count_val,temp_data_list_0,temp_data_list_1,temp_data_list_2,temp_data_list_3,temp_time_data_list):
     '''
     :param fig:                 画布
@@ -60,49 +62,91 @@ def Original_SemgSignal_Plot(fig,temp_data_count_val,temp_data_list_0,temp_data_
         # 清除之前画的图
         plt.clf()
 
+        # ================================== 时域曲线绘制 ==================================
+
         # plt.plot(x, y, format_string, **kwargs)
         # x：x轴数据，列表或数组，可选
         # y：y轴数据，列表或数组
         # format_string：控制曲线的格式字符串，可选，由颜色字符、风格字符和标记字符组成
 
-        fig.add_subplot(2, 2, 1)
+        fig.add_subplot(2, 4, 1)
         plt.plot(list(range(temp_data_count_val)), temp_data_list_0[:temp_data_count_val], 'r')
         # 添加标题
-        plt.title("Raw SEMG signal display:CH0", loc="left")
+        plt.title("Raw SEMG signal display:CH0", loc="left",fontsize='x-small',fontweight='heavy')
         # 设置x轴范围
         plt.xlim(-10, TEST_DATALIST_SIZE + 10)
         # 设置标签
-        plt.ylabel("Voltage value(mv)", size=12)
+        plt.ylabel("Voltage value(mv)", size=10)
 
-        fig.add_subplot(2, 2, 2)
+        fig.add_subplot(2, 4, 2)
         plt.plot(list(range(temp_data_count_val)), temp_data_list_1[:temp_data_count_val], 'b')
         # 添加标题
-        plt.title("Raw SEMG signal display:CH1", loc="left")
+        plt.title("Raw SEMG signal display:CH1", loc="left",fontsize='x-small',fontweight='heavy')
         # 设置x轴范围
         plt.xlim(-10, TEST_DATALIST_SIZE + 10)
         # 设置标签
-        plt.ylabel("Voltage value(mv)", size=12)
+        plt.ylabel("Voltage value(mv)", size=10)
 
-        fig.add_subplot(2, 2, 3)
+        fig.add_subplot(2, 4, 3)
         plt.plot(list(range(temp_data_count_val)), temp_data_list_2[:temp_data_count_val], 'm')
         # 添加标题
-        plt.title("Raw SEMG signal display:CH2", loc="left")
+        plt.title("Raw SEMG signal display:CH2", loc="left",fontsize='x-small',fontweight='heavy')
         # 设置x轴范围
         plt.xlim(-10, TEST_DATALIST_SIZE + 10)
         # 设置标签
-        plt.ylabel("Voltage value(mv)", size=12)
+        plt.ylabel("Voltage value(mv)", size=10)
 
-        fig.add_subplot(2, 2, 4)
+        fig.add_subplot(2, 4, 4)
         plt.plot(list(range(temp_data_count_val)), temp_data_list_3[:temp_data_count_val], 'c')
         # 添加标题
-        plt.title("Raw SEMG signal display:CH3", loc="left")
+        plt.title("Raw SEMG signal display:CH3", loc="left",fontsize='x-small',fontweight='heavy')
         # 设置x轴范围
         plt.xlim(-10, TEST_DATALIST_SIZE + 10)
         # 设置标签
-        plt.ylabel("Voltage value(mv)", size=12)
+        plt.ylabel("Voltage value(mv)", size=10)
 
         # print(temp_Voltage_Data_0_List[:temp_DataCount_Val])
         # print(temp_data_count_val)
+
+        # ================================== 幅频曲线绘制 ==================================
+
+        temp_semg_data_list_0 = temp_data_list_0[0:temp_data_count_val]
+        temp_semg_data_list_1 = temp_data_list_1[0:temp_data_count_val]
+        temp_semg_data_list_2 = temp_data_list_2[0:temp_data_count_val]
+        temp_semg_data_list_3 = temp_data_list_3[0:temp_data_count_val]
+
+        amp_list_0, fre_list_0, pha_list_0 = DigitalSignalsProcess.Get_Signals_FFT(temp_semg_data_list_0,
+                                                                                   DigitalSignalsProcess.SAMPLE_FRE)
+        amp_list_1, fre_list_1, pha_list_1 = DigitalSignalsProcess.Get_Signals_FFT(temp_semg_data_list_1,
+                                                                                   DigitalSignalsProcess.SAMPLE_FRE)
+        amp_list_2, fre_list_2, pha_list_2 = DigitalSignalsProcess.Get_Signals_FFT(temp_semg_data_list_2,
+                                                                                   DigitalSignalsProcess.SAMPLE_FRE)
+        amp_list_3, fre_list_3, pha_list_3 = DigitalSignalsProcess.Get_Signals_FFT(temp_semg_data_list_3,
+                                                                                   DigitalSignalsProcess.SAMPLE_FRE)
+
+        fig.add_subplot(2, 4, 5)
+        plt.title("SEMG signal FFT:CH0", loc="left",fontsize='x-small',fontweight='heavy')
+        plt.plot(fre_list_0, amp_list_0)
+        plt.ylabel('Amplitute / a.u.')
+        plt.xlabel('Frequence / Hz')
+
+        fig.add_subplot(2, 4, 6)
+        plt.title("SEMG signal FFT:CH1", loc="left",fontsize='x-small',fontweight='heavy')
+        plt.plot(fre_list_1, amp_list_1)
+        plt.ylabel('Amplitute / a.u.')
+        plt.xlabel('Frequence / Hz')
+
+        fig.add_subplot(2, 4, 7)
+        plt.title("SEMG signal FFT:CH2", loc="left",fontsize='x-small',fontweight='heavy')
+        plt.plot(fre_list_2, amp_list_2)
+        plt.ylabel('Amplitute / a.u.')
+        plt.xlabel('Frequence / Hz')
+
+        fig.add_subplot(2, 4, 8)
+        plt.title("SEMG signal FFT:CH3", loc="left",fontsize='x-small',fontweight='heavy')
+        plt.plot(fre_list_3, amp_list_3)
+        plt.ylabel('Amplitute / a.u.')
+        plt.xlabel('Frequence / Hz')
 
         plt.pause(PLOT_PAUSE_TIME)
         plt.ioff()
@@ -203,8 +247,7 @@ def Thread_Plot_Test_Data():
                                      Test_Voltage_Data_0_List,
                                      Test_Voltage_Data_1_List,
                                      Test_Voltage_Data_2_List,
-                                     Test_Voltage_Data_3_List,
-                                     Test_Time_List)
+                                     Test_Voltage_Data_3_List)
     return
 
 if __name__ == '__main__':

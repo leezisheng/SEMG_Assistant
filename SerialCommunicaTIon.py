@@ -51,7 +51,7 @@ now_voltage_data_3  = 0
 
 # 数据暂存队列
 # 队列尺寸
-DataSize                = 500
+DataSize                = 256
 #长度占位 声明长度为size的数据区
 now_time_list           = [None]*DataSize
 now_voltage_data_0_list = [None]*DataSize
@@ -68,11 +68,13 @@ USE_FUNCTIONS_RUN_TIME_TEST  = 0
 # 代码运行次数计数
 VAL_RunTimeCount             = 0
 # 代码运行次数阈值
-VAL_RunTimeCountTimes        = 2000
+VAL_RunTimeCountTimes        = 800
 # 电压成功接收次数
 VAL_SuccessRecvValValueTimes = 0
 # 是否开启线程测试：0-不启用，1-启用
 USE_THREAD_TEST              = 0
+# 使用线程：0-不启用，1-启用
+USE_THREAD_MODE = 1
 
 # ============================================== 函数定义 ==============================================
 
@@ -104,7 +106,7 @@ def Get_Serial_Port():
     return port[0]
 
 # 打开串口中固定端口并持续接收数据
-def Serial_Data_Receive(locker, port = None, size = 11):
+def Serial_Data_Receive(locker = None, port = None, size = 11):
     '''
     :description  : 根据数据帧格式对串口接收数据进行解析
     :param port   : 指定读取的端口
@@ -156,9 +158,9 @@ def Serial_Data_Receive(locker, port = None, size = 11):
     # 轮询读取
     while True :
         try:
-
-            # 获取互斥锁
-            locker.acquire()
+            if USE_THREAD_MODE == 1:
+                # 获取互斥锁
+                locker.acquire()
 
             if USE_THREAD_TEST == 1:
                 lock.acquire()
@@ -225,8 +227,9 @@ def Serial_Data_Receive(locker, port = None, size = 11):
 
                 # print(now_voltage_data_0_list)
 
-                # 释放互斥锁
-                locker.release()
+                if USE_THREAD_MODE == 1:
+                    # 释放互斥锁
+                    locker.release()
 
                 # 如果启用代码时间统计功能
                 if USE_FUNCTIONS_RUN_TIME_TEST == 1:
