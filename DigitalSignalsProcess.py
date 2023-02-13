@@ -31,6 +31,53 @@ TEST_SAMPLE_RATE = 44100
 #设置生成音频时间的长度
 TEST_DURATION    = 5
 
+# SEMG信号类
+class Semg_Feature_Class:
+
+    # 初始化方法
+    def __init__(self,signal_max,signal_min,signal_mean,signal_var,signal_rms,Median_frequency,Mean_frequency,Cog_frequency,MSE_frequency,Var_frequency):
+        # #初始化实例属性
+        self.t_max  = signal_max
+        self.t_min  = signal_min
+        self.t_mean = signal_mean
+        self.t_var  = signal_var
+        self.t_rms  = signal_rms
+
+        self.f_med  = Median_frequency
+        self.f_mean = Mean_frequency
+        self.f_cog  = Cog_frequency
+        self.f_mse  = MSE_frequency
+        self.f_var  = Var_frequency
+
+    # 打印属性
+    def detail(self):
+        print("========================时域特征========================")
+        print("最大值：",self.t_max)
+        print("最小值：",self.t_min)
+        print("平均值：",self.t_mean)
+        print("方差：  ",self.t_var)
+        print("有效值：",self.t_rms)
+        print("========================频域特征========================")
+        print("中值频率：",self.f_med)
+        print("均值频率：",self.f_mean)
+        print("重心频率：",self.f_cog)
+        print("均方频率：",self.f_mse)
+        print("频率方差：",self.f_var)
+
+    # 更新数据
+    def Update_Feature(self,signal_max,signal_min,signal_mean,signal_var,signal_rms,Median_frequency,Mean_frequency,Cog_frequency,MSE_frequency,Var_frequency):
+        self.t_max = signal_max
+        self.t_min = signal_min
+        self.t_mean = signal_mean
+        self.t_var = signal_var
+        self.t_rms = signal_rms
+
+        self.f_med = Median_frequency
+        self.f_mean = Mean_frequency
+        self.f_cog = Cog_frequency
+        self.f_mse = MSE_frequency
+        self.f_var = Var_frequency
+
 # ============================================== 函数定义 ==============================================
 
 # 产生一段虚拟的音频信号
@@ -182,52 +229,6 @@ def Get_Fre_Domain_Features(amp_list,fre_list = []):
     except Exception as e :
         print("exception ： ", e)
         print("频域特征计算错误")
-
-class Semg_Feature_Class:
-
-    # 初始化方法
-    def __init__(self,signal_max,signal_min,signal_mean,signal_var,signal_rms,Median_frequency,Mean_frequency,Cog_frequency,MSE_frequency,Var_frequency):
-        # #初始化实例属性
-        self.t_max  = signal_max
-        self.t_min  = signal_min
-        self.t_mean = signal_mean
-        self.t_var  = signal_var
-        self.t_rms  = signal_rms
-
-        self.f_med  = Median_frequency
-        self.f_mean = Mean_frequency
-        self.f_cog  = Cog_frequency
-        self.f_mse  = MSE_frequency
-        self.f_var  = Var_frequency
-
-    # 打印属性
-    def detail(self):
-        print("========================时域特征========================")
-        print("最大值：",self.t_max)
-        print("最小值：",self.t_min)
-        print("平均值：",self.t_mean)
-        print("方差：  ",self.t_var)
-        print("有效值：",self.t_rms)
-        print("========================频域特征========================")
-        print("中值频率：",self.f_med)
-        print("均值频率：",self.f_mean)
-        print("重心频率：",self.f_cog)
-        print("均方频率：",self.f_mse)
-        print("频率方差：",self.f_var)
-
-    # 更新数据
-    def Update_Feature(self,signal_max,signal_min,signal_mean,signal_var,signal_rms,Median_frequency,Mean_frequency,Cog_frequency,MSE_frequency,Var_frequency):
-        self.t_max = signal_max
-        self.t_min = signal_min
-        self.t_mean = signal_mean
-        self.t_var = signal_var
-        self.t_rms = signal_rms
-
-        self.f_med = Median_frequency
-        self.f_mean = Mean_frequency
-        self.f_cog = Cog_frequency
-        self.f_mse = MSE_frequency
-        self.f_var = Var_frequency
 
 if __name__ == '__main__':
 
