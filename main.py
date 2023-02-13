@@ -30,9 +30,6 @@ import DigitalSignalsProcess
 from DigitalSignalsProcess import Semg_Feature_Class
 # 多线程相关的库
 import threading
-# 时间相关的库
-import time
-from threading import Timer
 
 # ============================================== 全局变量 ==============================================
 
@@ -88,6 +85,10 @@ def Thread_Plot_Data():
 
 # 特征提取线程：时域特征和频域特征
 def Thread_Feature_Extraction():
+    global Semg_0_Feature
+    global Semg_1_Feature
+    global Semg_2_Feature
+    global Semg_3_Feature
 
     while True:
         # 获取锁
@@ -146,19 +147,18 @@ def Thread_Original_SemgSignal_Write():
                                             )
 
 if __name__ == '__main__':
+
     # 创建互斥锁
     lock = threading.Lock()
 
     # 线程声明
     thread_rcv       = threading.Thread(target=Thread_SerialDataRecv)
-    thread_trans     = threading.Thread(target=Thread_SeialDataTrans)
     thread_plot      = threading.Thread(target=Thread_Plot_Data)
     thread_OCS_save  = threading.Thread(target=Thread_Original_SemgSignal_Write)
-    thread_Feature   = threading.Thread(target=Thread_Feature_Extraction)
+    # thread_Feature   = threading.Thread(target=Thread_Feature_Extraction)
 
     # 线程开启
     thread_rcv.start()
-    thread_trans.start()
     thread_plot.start()
     thread_OCS_save.start()
-    thread_Feature.start()
+    # thread_Feature.start()

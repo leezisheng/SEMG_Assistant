@@ -66,17 +66,17 @@ class Semg_Feature_Class:
 
     # 更新数据
     def Update_Feature(self,signal_max,signal_min,signal_mean,signal_var,signal_rms,Median_frequency,Mean_frequency,Cog_frequency,MSE_frequency,Var_frequency):
-        self.t_max = signal_max
-        self.t_min = signal_min
-        self.t_mean = signal_mean
-        self.t_var = signal_var
-        self.t_rms = signal_rms
+        self.t_max  = int(signal_max)
+        self.t_min  = int(signal_min)
+        self.t_mean = int(signal_mean)
+        self.t_var  = int(signal_var)
+        self.t_rms  = int(signal_rms)
 
-        self.f_med = Median_frequency
-        self.f_mean = Mean_frequency
-        self.f_cog = Cog_frequency
-        self.f_mse = MSE_frequency
-        self.f_var = Var_frequency
+        self.f_med  = int(Median_frequency)
+        self.f_mean = int(Mean_frequency)
+        self.f_cog  = int(Cog_frequency)
+        self.f_mse  = int(MSE_frequency)
+        self.f_var  = int(Var_frequency)
 
 # ============================================== 函数定义 ==============================================
 
@@ -127,6 +127,7 @@ def Get_Signals_FFT(Signal_List,Sample_frequency):
     except Exception as e :
         print("exception ： ", e)
         print("FFT计算错误")
+        return 0, 0, 0, 0, 0
 
 # 计算时域特征：包括最大值、最小值、均值、方差、有效值
 def Get_Time_Domain_Features(Signal_List):
@@ -150,6 +151,7 @@ def Get_Time_Domain_Features(Signal_List):
     except Exception as e :
         print("exception ： ", e)
         print("时域特征计算错误")
+        return 0,0,0,0,0
 
 # 计算频域特征：包括中值频率、均值频率、重心频率、均方频率、频率方差
 def Get_Fre_Domain_Features(amp_list,fre_list = []):
@@ -229,6 +231,7 @@ def Get_Fre_Domain_Features(amp_list,fre_list = []):
     except Exception as e :
         print("exception ： ", e)
         print("频域特征计算错误")
+        return 0, 0, 0, 0, 0
 
 if __name__ == '__main__':
 
